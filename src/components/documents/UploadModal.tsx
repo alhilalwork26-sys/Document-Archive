@@ -135,7 +135,7 @@ export function UploadModal({
     }
 
     const { error: insertError } = await supabase.from("documents").insert({
-      folder_id: folderId ?? categoryId ?? null,
+      folder_id: folderId || categoryId || null,
       name: name.trim(),
       description: description.trim() || null,
       storage_path: path,

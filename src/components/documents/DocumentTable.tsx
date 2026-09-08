@@ -10,7 +10,8 @@ import type { DocumentFile } from "@/lib/types";
 import { formatBytes, formatDate } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, Lock, MoreHorizontal, Search, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { getFileIcon } from "./file-icon";
 import { PasswordPromptModal } from "./PasswordPromptModal";
 
@@ -26,7 +27,17 @@ export function DocumentTable({
   const { push } = useToast();
   const [query, setQuery] = useState("");
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number } | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  // Close the row menu on scroll — its fixed position would otherwise
+  // drift away from the trigger button.
+  useEffect(() => {
+    if (!openMenu) return;
+    const close = () => setOpenMenu(null);
+    window.addEventListener("scroll", close, true);
+    return () => window.removeEventListener("scroll", close, true);
+  }, [openMenu]);
   const [pendingDownload, setPendingDownload] = useState<DocumentFile | null>(null);
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -38,6 +49,8 @@ export function DocumentTable({
     const q = query.trim().toLowerCase();
     return q ? documents.filter((d) => d.name.toLowerCase().includes(q)) : documents;
   }, [documents, query]);
+
+  const openDoc = filtered.find((d) => d.id === openMenu) ?? null;
 
   async function doDownload(doc: DocumentFile) {
     setBusyId(doc.id);
@@ -175,42 +188,19 @@ export function DocumentTable({
                     </td>
                     <td className="px-4 py-3 relative">
                       <button
-                        onClick={() =>
-                          setOpenMenu(openMenu === doc.id ? null : doc.id)
-                        }
+                        onClick={(e) => {
+                          if (openMenu === doc.id) {
+                            setOpenMenu(null);
+                            return;
+                          }
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setMenuPos({ top: rect.bottom + 4, left: rect.right - 160 });
+                          setOpenMenu(doc.id);
+                        }}
                         className="rounded-md p-1.5 text-muted hover:text-dark hover:bg-surface"
                       >
                         <MoreHorizontal className="size-4" />
                       </button>
-                      {openMenu === doc.id && (
-                        <>
-                          <div
-                            className="fixed inset-0 z-10"
-                            onClick={() => setOpenMenu(null)}
-                          />
-                          <motion.div
-                            initial={{ opacity: 0, y: -4 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="absolute right-4 top-9 z-20 w-40 rounded-lg border border-border bg-white shadow-lg py-1"
-                          >
-                            <button
-                              onClick={() => {
-                                setOpenMenu(null);
-                                handleDownload(doc);
-                              }}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-dark hover:bg-surface"
-                            >
-                              <Download className="size-3.5" /> Unduh
-                            </button>
-                            <button
-                              onClick={() => handleDelete(doc)}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-surface"
-                            >
-                              <Trash2 className="size-3.5" /> Hapus
-                            </button>
-                          </motion.div>
-                        </>
-                      )}
                     </td>
                   </motion.tr>
                 );
@@ -224,6 +214,37 @@ export function DocumentTable({
           </p>
         )}
       </div>
+
+      {openDoc &&
+        menuPos &&
+        createPortal(
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{ top: menuPos.top, left: menuPos.left }}
+              className="fixed z-50 w-40 rounded-lg border border-border bg-white shadow-lg py-1"
+            >
+              <button
+                onClick={() => {
+                  setOpenMenu(null);
+                  handleDownload(openDoc);
+                }}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-dark hover:bg-surface"
+              >
+                <Download className="size-3.5" /> Unduh
+              </button>
+              <button
+                onClick={() => handleDelete(openDoc)}
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-surface"
+              >
+                <Trash2 className="size-3.5" /> Hapus
+              </button>
+            </motion.div>
+          </>,
+          document.body,
+        )}
 
       <PasswordPromptModal
         key={pendingDownload?.id ?? "none"}

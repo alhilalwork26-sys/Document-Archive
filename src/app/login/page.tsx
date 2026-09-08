@@ -29,7 +29,7 @@ function LoginForm() {
       setError("Email atau kata sandi salah.");
       return;
     }
-    router.replace(params.get("next") || "/");
+    router.replace(params.get("next") || "/dashboard");
     router.refresh();
   }
 
@@ -60,7 +60,7 @@ function LoginForm() {
         <div className="flex size-11 items-center justify-center rounded-xl bg-accent-600 text-white shadow-lg shadow-accent-600/25">
           <ShieldCheck className="size-6" />
         </div>
-        <h1 className="text-lg font-semibold text-dark">Arsip Dokumen GRCC</h1>
+        <h1 className="text-lg font-semibold text-dark">ArsipOne GRCC</h1>
         <p className="text-sm text-muted text-center">
           Akses privat untuk dokumen internal GRCC
         </p>

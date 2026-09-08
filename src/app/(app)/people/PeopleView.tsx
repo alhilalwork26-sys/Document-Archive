@@ -69,7 +69,7 @@ export function PeopleView({
     <>
       <PageHeader
         title="Pengguna"
-        description="Kelola akun Admin & Pengguna Arsip Dokumen GRCC"
+        description="Kelola akun Admin & Pengguna ArsipOne GRCC"
         actions={
           <Button onClick={() => setAddOpen(true)}>
             <UserPlus className="size-4" /> Tambah Pengguna

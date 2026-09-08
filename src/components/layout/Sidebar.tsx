@@ -19,7 +19,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/folders", label: "Dokumen", icon: FolderOpen, exact: false },
 ];
 
@@ -57,7 +57,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
         </div>
         {!collapsed && (
           <span className="text-sm font-semibold text-dark truncate flex-1">
-            Arsip GRCC
+            ArsipOne GRCC
           </span>
         )}
         <button

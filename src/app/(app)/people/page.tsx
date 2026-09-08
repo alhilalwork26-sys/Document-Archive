@@ -16,7 +16,7 @@ export default async function PeoplePage() {
     .eq("id", user.id)
     .single<Profile>();
 
-  if (!me || me.role !== "admin") redirect("/");
+  if (!me || me.role !== "admin") redirect("/dashboard");
 
   const { data: profiles } = await supabase
     .from("profiles")

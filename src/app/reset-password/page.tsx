@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
       return;
     }
     setDone(true);
-    setTimeout(() => router.replace("/"), 1500);
+    setTimeout(() => router.replace("/dashboard"), 1500);
   }
 
   return (

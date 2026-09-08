@@ -60,7 +60,7 @@ export default function SetupPage() {
           </div>
           <h1 className="text-lg font-semibold text-dark">Siapkan Akun Admin</h1>
           <p className="text-sm text-muted text-center">
-            Langkah pertama untuk mengaktifkan Arsip Dokumen GRCC
+            Langkah pertama untuk mengaktifkan ArsipOne GRCC
           </p>
         </div>
 

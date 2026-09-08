@@ -59,14 +59,14 @@ export function FolderView({
       return;
     }
     push("success", "Folder dihapus.");
-    router.replace("/");
+    router.replace("/dashboard");
     router.refresh();
   }
 
   return (
     <>
       <div className="flex items-center gap-1.5 text-sm text-muted mb-4">
-        <Link href="/" className="hover:text-dark">
+        <Link href="/dashboard" className="hover:text-dark">
           Dashboard
         </Link>
         <ChevronRight className="size-3.5" />

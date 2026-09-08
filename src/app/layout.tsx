@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Arsip Dokumen GRCC",
-  description: "Arsip dokumen internal GRCC — aman, terorganisir, dan privat.",
+  title: "ArsipOne GRCC",
+  description: "Tempat penyimpanan dokumen penting GRCC — aman, terorganisir, dan privat.",
   robots: {
     index: false,
     follow: false,

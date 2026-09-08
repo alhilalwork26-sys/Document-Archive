@@ -1,13 +1,14 @@
 "use client";
 
 import { DocumentTable } from "@/components/documents/DocumentTable";
+import { FilterChips, type FilterChip } from "@/components/documents/FilterChips";
 import { FilterMenuButton } from "@/components/documents/FilterMenuButton";
 import { SortMenuButton } from "@/components/documents/SortMenuButton";
 import { UploadModal } from "@/components/documents/UploadModal";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { DOCUMENTS_BUCKET } from "@/lib/constants";
-import { type FileCategory, getFileCategory } from "@/lib/file-category";
+import { CATEGORY_LABELS, type FileCategory, getFileCategory } from "@/lib/file-category";
 import { createClient } from "@/lib/supabase/client";
 import type { DocumentFile, Folder, SortValue } from "@/lib/types";
 import { sortDocuments } from "@/lib/utils";
@@ -37,6 +38,23 @@ export function FolderView({
         : initialDocuments;
     return sortDocuments(rows, sort);
   }, [initialDocuments, categoryFilter, sort]);
+
+  const filterChips = useMemo(() => {
+    const chips: FilterChip[] = [];
+    for (const cat of categoryFilter) {
+      chips.push({
+        key: `category-${cat}`,
+        label: CATEGORY_LABELS[cat],
+        onRemove: () =>
+          setCategoryFilter((prev) => {
+            const next = new Set(prev);
+            next.delete(cat);
+            return next;
+          }),
+      });
+    }
+    return chips;
+  }, [categoryFilter]);
 
   async function handleDeleteFolder() {
     if (
@@ -107,6 +125,8 @@ export function FolderView({
         />
         <SortMenuButton value={sort} onChange={setSort} />
       </div>
+
+      <FilterChips chips={filterChips} />
 
       <DocumentTable documents={visibleDocuments} onChanged={() => router.refresh()} />
 

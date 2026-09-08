@@ -1,6 +1,7 @@
 "use client";
 
 import { DocumentTable } from "@/components/documents/DocumentTable";
+import { FilterChips, type FilterChip } from "@/components/documents/FilterChips";
 import { FilterMenuButton } from "@/components/documents/FilterMenuButton";
 import { FolderCard } from "@/components/documents/FolderCard";
 import { getFileIcon } from "@/components/documents/file-icon";
@@ -9,7 +10,7 @@ import { NewMenuButton } from "@/components/documents/NewMenuButton";
 import { SortMenuButton } from "@/components/documents/SortMenuButton";
 import { UploadModal } from "@/components/documents/UploadModal";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { getFileCategory, type FileCategory } from "@/lib/file-category";
+import { CATEGORY_LABELS, getFileCategory, type FileCategory } from "@/lib/file-category";
 import type { DocumentFile, Folder, SortValue } from "@/lib/types";
 import { formatBytes, formatDate, sortDocuments } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -39,6 +40,33 @@ export function DashboardView({
       rows = rows.filter((d) => categoryFilter.has(getFileCategory(d.mime_type)));
     return sortDocuments(rows, sort);
   }, [initialDocuments, folderFilter, categoryFilter, sort]);
+
+  const filterChips = useMemo(() => {
+    const chips: FilterChip[] = [];
+    if (folderFilter !== "all") {
+      const folder = initialFolders.find((f) => f.id === folderFilter);
+      if (folder) {
+        chips.push({
+          key: `folder-${folder.id}`,
+          label: folder.name,
+          onRemove: () => setFolderFilter("all"),
+        });
+      }
+    }
+    for (const cat of categoryFilter) {
+      chips.push({
+        key: `category-${cat}`,
+        label: CATEGORY_LABELS[cat],
+        onRemove: () =>
+          setCategoryFilter((prev) => {
+            const next = new Set(prev);
+            next.delete(cat);
+            return next;
+          }),
+      });
+    }
+    return chips;
+  }, [folderFilter, categoryFilter, initialFolders]);
 
   function refresh() {
     router.refresh();
@@ -116,6 +144,7 @@ export function DashboardView({
             <SortMenuButton value={sort} onChange={setSort} />
           </div>
         </div>
+        <FilterChips chips={filterChips} />
         <DocumentTable documents={visibleDocuments} showFolder onChanged={refresh} />
       </section>
 

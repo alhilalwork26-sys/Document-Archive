@@ -7,7 +7,7 @@ import { formatDateTime } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, FileText } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface RecentDoc {
   id: string;
@@ -19,38 +19,57 @@ interface RecentDoc {
 export function NotificationBell({ profile }: { profile: Profile }) {
   const [open, setOpen] = useState(false);
   const [docs, setDocs] = useState<RecentDoc[]>([]);
-  const [lastSeenAt, setLastSeenAt] = useState(profile.notifications_seen_at);
+  const [docsLoading, setDocsLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loaded, setLoaded] = useState(false);
+  const lastSeenAtRef = useRef(profile.notifications_seen_at);
   const ref = useRef<HTMLDivElement>(null);
   useClickOutside(ref, () => setOpen(false));
 
-  useEffect(() => {
+  const refreshUnreadCount = useCallback(async () => {
     const supabase = createClient();
-    supabase
+    const { count } = await supabase
       .from("documents")
-      .select("id,name,created_at,folder_id")
-      .order("created_at", { ascending: false })
-      .limit(8)
-      .then(({ data }) => {
-        setDocs((data ?? []) as RecentDoc[]);
-        setLoaded(true);
-      });
+      .select("id", { count: "exact", head: true })
+      .gt("created_at", lastSeenAtRef.current);
+    setUnreadCount(count ?? 0);
+    setLoaded(true);
   }, []);
 
-  const unreadCount = docs.filter((d) => new Date(d.created_at) > new Date(lastSeenAt)).length;
+  useEffect(() => {
+    refreshUnreadCount();
+  }, [refreshUnreadCount]);
 
   async function handleOpen() {
     const wasOpen = open;
     setOpen(!wasOpen);
-    if (!wasOpen && unreadCount > 0) {
+    if (wasOpen) return;
+
+    // Always refetch — the sidebar (and this component) stays mounted
+    // across client-side navigations, so a cached list would go stale
+    // the moment anyone uploads a new document.
+    setDocsLoading(true);
+    const supabase = createClient();
+    const fetchDocs = supabase
+      .from("documents")
+      .select("id,name,created_at,folder_id")
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    if (unreadCount > 0) {
       const now = new Date().toISOString();
-      setLastSeenAt(now);
-      const supabase = createClient();
-      await supabase
-        .from("profiles")
-        .update({ notifications_seen_at: now })
-        .eq("id", profile.id);
+      const [{ data }] = await Promise.all([
+        fetchDocs,
+        supabase.from("profiles").update({ notifications_seen_at: now }).eq("id", profile.id),
+      ]);
+      lastSeenAtRef.current = now;
+      setUnreadCount(0);
+      setDocs((data ?? []) as RecentDoc[]);
+    } else {
+      const { data } = await fetchDocs;
+      setDocs((data ?? []) as RecentDoc[]);
     }
+    setDocsLoading(false);
   }
 
   return (
@@ -81,7 +100,9 @@ export function NotificationBell({ profile }: { profile: Profile }) {
               <p className="text-sm font-semibold text-dark">Aktivitas Terbaru</p>
             </div>
             <div className="max-h-80 overflow-y-auto">
-              {docs.length === 0 ? (
+              {docsLoading ? (
+                <p className="text-sm text-muted text-center py-6">Memuat…</p>
+              ) : docs.length === 0 ? (
                 <p className="text-sm text-muted text-center py-6">Belum ada dokumen.</p>
               ) : (
                 docs.map((doc) => (

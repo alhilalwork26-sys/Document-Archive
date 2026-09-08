@@ -85,11 +85,13 @@ export function PreviewModal({
   onClose,
   doc,
   signedUrl,
+  onDownload,
 }: {
   open: boolean;
   onClose: () => void;
   doc: DocumentFile | null;
   signedUrl: string | null;
+  onDownload: () => void;
 }) {
   if (!doc) return null;
 
@@ -149,26 +151,22 @@ export function PreviewModal({
               Format ini (mis. Excel/PowerPoint/ZIP) belum bisa ditampilkan langsung di browser
               tanpa mengirim file ke layanan pihak ketiga — silakan unduh untuk membukanya.
             </p>
-            <a
-              href={signedUrl}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={onDownload}
               className="inline-flex items-center gap-2 h-9 px-4 rounded-lg text-sm font-medium bg-accent-600 text-white hover:bg-accent-700 transition-colors"
             >
               <Download className="size-4" /> Unduh File
-            </a>
+            </button>
           </div>
         )}
 
-        {previewable && (
-          <a
-            href={signedUrl ?? undefined}
-            target="_blank"
-            rel="noreferrer"
+        {previewable && signedUrl && (
+          <button
+            onClick={onDownload}
             className="self-end inline-flex items-center gap-1.5 text-xs font-medium text-muted hover:text-dark"
           >
             <Download className="size-3.5" /> Unduh file ini
-          </a>
+          </button>
         )}
       </div>
     </Modal>

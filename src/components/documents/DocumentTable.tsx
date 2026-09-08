@@ -345,6 +345,7 @@ export function DocumentTable({
         }}
         doc={previewDoc}
         signedUrl={previewUrl}
+        onDownload={() => previewDoc && doDownload(previewDoc.storage_path, previewDoc.name)}
       />
 
       <ReplaceFileModal

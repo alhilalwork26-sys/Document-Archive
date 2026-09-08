@@ -32,7 +32,7 @@ export default async function AppLayout({
     <div className="flex h-screen w-full overflow-hidden">
       <Sidebar profile={profile} />
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto px-6 py-8 md:px-10">{children}</div>
+        <div className="max-w-6xl mx-auto px-6 pt-20 pb-8 md:px-10 md:py-8">{children}</div>
       </main>
     </div>
   );

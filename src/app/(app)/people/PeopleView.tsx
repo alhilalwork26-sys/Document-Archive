@@ -78,6 +78,7 @@ export function PeopleView({
       />
 
       <div className="rounded-2xl border border-border bg-white overflow-hidden">
+        <div className="min-w-[640px] overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs text-muted border-b border-border">
@@ -145,6 +146,7 @@ export function PeopleView({
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       <AddUserModal open={addOpen} onClose={() => setAddOpen(false)} onCreated={refresh} />

@@ -62,7 +62,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
         <button
           onClick={() => setMobileOpen(true)}
           aria-label="Buka menu"
-          className="md:hidden fixed top-4 left-4 z-30 flex size-10 items-center justify-center rounded-lg bg-white border border-border shadow-sm text-dark"
+          className="md:hidden fixed top-4 left-4 z-30 flex size-10 items-center justify-center rounded-lg bg-white border border-border shadow-sm text-dark transition-transform active:scale-95"
         >
           <Menu className="size-5" />
         </button>
@@ -100,13 +100,13 @@ export function Sidebar({ profile }: { profile: Profile }) {
           <button
             onClick={() => setMobileOpen(false)}
             aria-label="Tutup menu"
-            className="md:hidden ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-muted hover:text-dark hover:bg-surface transition-colors"
+            className="md:hidden ml-auto flex size-7 shrink-0 items-center justify-center rounded-md text-muted hover:text-dark hover:bg-surface transition-all active:scale-90"
           >
             <X className="size-4" />
           </button>
           <button
             onClick={() => setCollapsed((c) => !c)}
-            className="hidden md:flex ml-auto size-7 shrink-0 items-center justify-center rounded-md text-muted hover:text-dark hover:bg-surface transition-colors"
+            className="hidden md:flex ml-auto size-7 shrink-0 items-center justify-center rounded-md text-muted hover:text-dark hover:bg-surface transition-all active:scale-90"
             aria-label={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
           >
             {collapsed ? (
@@ -127,7 +127,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group relative flex items-center gap-3 rounded-lg px-3 h-10 text-sm font-medium transition-colors ${
+                className={`group relative flex items-center gap-3 rounded-lg px-3 h-10 text-sm font-medium transition-all active:scale-[0.98] ${
                   active
                     ? "bg-accent-50 text-accent-700"
                     : "text-muted hover:text-dark hover:bg-surface"
@@ -165,7 +165,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
           <button
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex items-center gap-3 rounded-lg px-3 h-9 text-sm text-muted hover:text-dark hover:bg-surface transition-colors disabled:opacity-50"
+            className="flex items-center gap-3 rounded-lg px-3 h-9 text-sm text-muted hover:text-dark hover:bg-surface transition-all active:scale-[0.98] disabled:opacity-50"
           >
             <LogOut className="size-4 shrink-0" />
             {!collapsed && <span>Keluar</span>}

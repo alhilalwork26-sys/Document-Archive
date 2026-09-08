@@ -33,6 +33,11 @@ create table if not exists document_archive.profiles (
   created_at  timestamptz not null default now()
 );
 
+-- Tracks when each member last opened the notification bell, so unread
+-- "new document" counts can be computed as documents.created_at > this.
+alter table document_archive.profiles
+  add column if not exists notifications_seen_at timestamptz not null default now();
+
 -- Auto-create a profile row whenever a new auth user is created *by this
 -- app* — gated on `raw_user_meta_data->>'da_app' = 'document_archive'`,
 -- which /api/setup and /api/admin/users always set. Sign-ups from other
@@ -138,17 +143,39 @@ create table if not exists document_archive.documents (
   -- these columns, same as every other document column).
   is_confidential   boolean not null default false,
   password_hash     text,
-  password_salt     text
+  password_salt     text,
+  -- Versioning: `version`/`updated_at` describe the CURRENT file this row
+  -- points to; superseded files are snapshotted into document_versions
+  -- below rather than deleted, so old copies stay downloadable.
+  version           integer not null default 1,
+  updated_at        timestamptz not null default now()
 );
 
 alter table document_archive.documents add column if not exists description text;
 alter table document_archive.documents add column if not exists is_confidential boolean not null default false;
 alter table document_archive.documents add column if not exists password_hash text;
 alter table document_archive.documents add column if not exists password_salt text;
+alter table document_archive.documents add column if not exists version integer not null default 1;
+alter table document_archive.documents add column if not exists updated_at timestamptz not null default now();
+
+-- 3b. DOCUMENT VERSIONS — snapshot of a document's file each time it's
+-- replaced via "Ganti File". The `documents` row above always holds the
+-- CURRENT file; this table holds everything it superseded.
+create table if not exists document_archive.document_versions (
+  id            uuid primary key default gen_random_uuid(),
+  document_id   uuid not null references document_archive.documents(id) on delete cascade,
+  version       integer not null,
+  storage_path  text not null,
+  size_bytes    bigint not null default 0,
+  mime_type     text not null default 'application/octet-stream',
+  uploaded_by   uuid references document_archive.profiles(id) on delete set null,
+  created_at    timestamptz not null default now()
+);
 
 create index if not exists documents_folder_id_idx on document_archive.documents(folder_id);
 create index if not exists documents_uploaded_by_idx on document_archive.documents(uploaded_by);
 create index if not exists folders_created_by_idx on document_archive.folders(created_by);
+create index if not exists document_versions_document_id_idx on document_archive.document_versions(document_id);
 
 -- ── PRIVILEGES ────────────────────────────────────────────────────────────
 -- A brand-new schema has no default grants (unlike `public`) — without
@@ -161,9 +188,10 @@ alter default privileges in schema document_archive
   grant all on tables to authenticated, service_role;
 
 -- ── RLS ───────────────────────────────────────────────────────────────────
-alter table document_archive.profiles  enable row level security;
-alter table document_archive.folders   enable row level security;
-alter table document_archive.documents enable row level security;
+alter table document_archive.profiles          enable row level security;
+alter table document_archive.folders           enable row level security;
+alter table document_archive.documents         enable row level security;
+alter table document_archive.document_versions enable row level security;
 
 drop policy if exists "profiles_select_members" on document_archive.profiles;
 create policy "profiles_select_members" on document_archive.profiles
@@ -186,6 +214,11 @@ create policy "folders_all_members" on document_archive.folders
 
 drop policy if exists "documents_all_members" on document_archive.documents;
 create policy "documents_all_members" on document_archive.documents
+  for all using (document_archive.is_archive_member())
+  with check (document_archive.is_archive_member());
+
+drop policy if exists "document_versions_all_members" on document_archive.document_versions;
+create policy "document_versions_all_members" on document_archive.document_versions
   for all using (document_archive.is_archive_member())
   with check (document_archive.is_archive_member());
 

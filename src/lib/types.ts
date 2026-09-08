@@ -7,6 +7,7 @@ export interface Profile {
   role: UserRole;
   is_active: boolean;
   created_at: string;
+  notifications_seen_at: string;
 }
 
 export interface Folder {
@@ -41,6 +42,20 @@ export interface DocumentFile {
   is_confidential: boolean;
   password_hash: string | null;
   password_salt: string | null;
+  version: number;
+  updated_at: string;
   uploader?: Pick<Profile, "id" | "full_name" | "email">;
   folder?: Pick<Folder, "id" | "name">;
+}
+
+export interface DocumentVersion {
+  id: string;
+  document_id: string;
+  version: number;
+  storage_path: string;
+  size_bytes: number;
+  mime_type: string;
+  uploaded_by: string;
+  created_at: string;
+  uploader?: Pick<Profile, "id" | "full_name" | "email">;
 }

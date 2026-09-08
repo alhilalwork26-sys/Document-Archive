@@ -1,5 +1,6 @@
 "use client";
 
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { Avatar } from "@/components/ui/Avatar";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
@@ -97,6 +98,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
               ArsipOne GRCC
             </span>
           )}
+          {!collapsed && <NotificationBell profile={profile} />}
           <button
             onClick={() => setMobileOpen(false)}
             aria-label="Tutup menu"

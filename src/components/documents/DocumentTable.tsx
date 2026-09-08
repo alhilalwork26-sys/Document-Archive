@@ -3,6 +3,7 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { useToast } from "@/components/ui/Toast";
 import { DOCUMENTS_BUCKET } from "@/lib/constants";
+import { CATEGORY_COLORS, getFileCategory } from "@/lib/file-category";
 import { verifyPassword } from "@/lib/password";
 import { createClient } from "@/lib/supabase/client";
 import type { DocumentFile } from "@/lib/types";
@@ -123,6 +124,7 @@ export function DocumentTable({
             <AnimatePresence>
               {filtered.map((doc) => {
                 const Icon = getFileIcon(doc.mime_type);
+                const accent = CATEGORY_COLORS[getFileCategory(doc.mime_type)];
                 return (
                   <motion.tr
                     key={doc.id}
@@ -131,9 +133,15 @@ export function DocumentTable({
                     exit={{ opacity: 0 }}
                     className="border-b border-border last:border-0 hover:bg-surface/60 transition-colors"
                   >
-                    <td className="px-4 py-2.5">
+                    <td
+                      className="pl-3 pr-4 py-3 border-l-4"
+                      style={{ borderLeftColor: accent }}
+                    >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface text-muted">
+                        <div
+                          className="flex size-8 shrink-0 items-center justify-center rounded-lg"
+                          style={{ backgroundColor: `${accent}1a`, color: accent }}
+                        >
                           <Icon className="size-4" />
                         </div>
                         <span className="truncate font-medium text-dark">{doc.name}</span>
@@ -143,11 +151,11 @@ export function DocumentTable({
                       </div>
                     </td>
                     {showFolder && (
-                      <td className="px-4 py-2.5 text-muted">
+                      <td className="px-4 py-3 text-muted">
                         {doc.folder?.name ?? "—"}
                       </td>
                     )}
-                    <td className="px-4 py-2.5 text-muted">
+                    <td className="px-4 py-3 text-muted">
                       {doc.uploader ? (
                         <div className="flex items-center gap-2">
                           <Avatar name={doc.uploader.full_name || doc.uploader.email} />
@@ -159,13 +167,13 @@ export function DocumentTable({
                         "—"
                       )}
                     </td>
-                    <td className="px-4 py-2.5 text-muted whitespace-nowrap">
+                    <td className="px-4 py-3 text-muted whitespace-nowrap">
                       {formatDate(doc.created_at)}
                     </td>
-                    <td className="px-4 py-2.5 text-muted whitespace-nowrap">
+                    <td className="px-4 py-3 text-muted whitespace-nowrap">
                       {formatBytes(doc.size_bytes)}
                     </td>
-                    <td className="px-4 py-2.5 relative">
+                    <td className="px-4 py-3 relative">
                       <button
                         onClick={() =>
                           setOpenMenu(openMenu === doc.id ? null : doc.id)

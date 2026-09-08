@@ -24,16 +24,22 @@ export function formatBytes(bytes: number): string {
   return `${value.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("id-ID", {
+export function formatDate(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("id-ID", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
-export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("id-ID", {
+export function formatDateTime(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleString("id-ID", {
     day: "numeric",
     month: "short",
     year: "numeric",

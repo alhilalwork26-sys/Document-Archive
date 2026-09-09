@@ -14,6 +14,7 @@ import { CATEGORY_LABELS, getFileCategory, type FileCategory } from "@/lib/file-
 import type { DocumentFile, Folder, SortValue } from "@/lib/types";
 import { formatBytes, formatDate, sortDocuments } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Pin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -32,6 +33,8 @@ export function DashboardView({
   const [categoryFilter, setCategoryFilter] = useState<Set<FileCategory>>(new Set());
 
   const recent = initialDocuments.slice(0, 6);
+  const pinnedFolders = initialFolders.filter((f) => f.is_pinned);
+  const unpinnedFolders = initialFolders.filter((f) => !f.is_pinned);
 
   const visibleDocuments = useMemo(() => {
     let rows = initialDocuments;
@@ -85,16 +88,33 @@ export function DashboardView({
         }
       />
 
+      {pinnedFolders.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-sm font-medium text-muted mb-3 flex items-center gap-1.5">
+            <Pin className="size-3.5" /> Disematkan
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {pinnedFolders.map((folder, i) => (
+              <FolderCard key={folder.id} folder={folder} index={i} onChanged={refresh} />
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="mb-8">
         <h2 className="text-sm font-medium text-muted mb-3">Folder</h2>
-        {initialFolders.length === 0 ? (
+        {unpinnedFolders.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border py-10 text-center">
-            <p className="text-sm text-muted">Belum ada folder. Buat folder pertama Anda.</p>
+            <p className="text-sm text-muted">
+              {initialFolders.length === 0
+                ? "Belum ada folder. Buat folder pertama Anda."
+                : "Semua folder sudah disematkan."}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {initialFolders.map((folder, i) => (
-              <FolderCard key={folder.id} folder={folder} index={i} />
+            {unpinnedFolders.map((folder, i) => (
+              <FolderCard key={folder.id} folder={folder} index={i} onChanged={refresh} />
             ))}
           </div>
         )}

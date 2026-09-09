@@ -27,3 +27,19 @@ export const METADATA_KEYS = {
 
 /** Value stamped under METADATA_KEYS.app for every account this app creates. */
 export const APP_METADATA_MARKER = "document_archive";
+
+/** Palette offered when picking a folder's color. */
+export const FOLDER_COLORS = [
+  "#4F46E5", // indigo
+  "#0EA5E9", // sky
+  "#0D9488", // teal
+  "#10B981", // emerald
+  "#84CC16", // lime
+  "#F59E0B", // amber
+  "#F97316", // orange
+  "#EF4444", // red
+  "#EC4899", // pink
+  "#A855F7", // purple
+  "#64748B", // slate
+  "#666560", // neutral
+] as const;

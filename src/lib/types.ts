@@ -17,6 +17,7 @@ export interface Folder {
   color: string;
   created_by: string;
   created_at: string;
+  is_pinned: boolean;
   document_count?: number;
   total_bytes?: number;
 }

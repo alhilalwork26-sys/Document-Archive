@@ -1,3 +1,4 @@
+import { IdleLogout } from "@/components/layout/IdleLogout";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/types";
@@ -30,6 +31,7 @@ export default async function AppLayout({
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
+      <IdleLogout />
       <Sidebar profile={profile} />
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-6xl mx-auto px-6 pt-20 pb-8 md:px-10 md:py-8">{children}</div>

@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
+import { FOLDER_COLORS } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 
-const COLORS = ["#4F46E5", "#0EA5E9", "#10B981", "#F59E0B", "#EF4444", "#666560"];
+const COLORS = FOLDER_COLORS;
 
 export function NewFolderModal({
   open,
@@ -21,7 +22,7 @@ export function NewFolderModal({
   const { push } = useToast();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [color, setColor] = useState(COLORS[0]);
+  const [color, setColor] = useState<string>(COLORS[0]);
   const [loading, setLoading] = useState(false);
 
   function reset() {
@@ -81,13 +82,13 @@ export function NewFolderModal({
         />
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-dark">Warna</label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {COLORS.map((c) => (
               <button
                 type="button"
                 key={c}
                 onClick={() => setColor(c)}
-                className={`size-7 rounded-full transition-transform ${
+                className={`size-7 rounded-full transition-transform active:scale-95 ${
                   color === c ? "ring-2 ring-offset-2 ring-accent-600 scale-105" : ""
                 }`}
                 style={{ backgroundColor: c }}

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
 import { motion } from "framer-motion";
-import { CheckCircle2, Lock, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -47,10 +47,9 @@ export default function ResetPasswordPage() {
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-sm"
       >
-        <div className="flex flex-col items-center gap-2 mb-8">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-accent-600 text-white shadow-lg shadow-accent-600/25">
-            <ShieldCheck className="size-6" />
-          </div>
+        <div className="flex flex-col items-center gap-3 mb-8">
+          {/* eslint-disable-next-line @next/next/no-img-element -- static local asset */}
+          <img src="/grcc-mark.png" alt="GRCC" className="h-12 w-auto" />
           <h1 className="text-lg font-semibold text-dark">Atur Kata Sandi Baru</h1>
         </div>
 

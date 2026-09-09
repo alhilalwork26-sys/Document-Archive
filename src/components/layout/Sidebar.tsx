@@ -13,7 +13,6 @@ import {
   LogOut,
   Menu,
   Settings,
-  ShieldCheck,
   Users,
   X,
 } from "lucide-react";
@@ -90,9 +89,12 @@ export function Sidebar({ profile }: { profile: Profile }) {
         }`}
       >
         <div className="flex items-center gap-2 px-4 h-16 border-b border-border">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-accent-600 text-white">
-            <ShieldCheck className="size-4.5" />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- static local asset, no next/image config needed for a single small logo */}
+          <img
+            src="/icon.png"
+            alt="GRCC"
+            className="size-8 shrink-0 rounded-lg border border-border object-contain"
+          />
           {!collapsed && (
             <span className="text-sm font-semibold text-dark truncate flex-1">
               ArsipOne GRCC
@@ -119,7 +121,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-1">
+        <nav className={`flex-1 overflow-y-auto py-4 flex flex-col gap-1 ${collapsed ? "px-2" : "px-3"}`}>
           {items.map((item) => {
             const active = item.exact
               ? pathname === item.href
@@ -129,7 +131,9 @@ export function Sidebar({ profile }: { profile: Profile }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group relative flex items-center gap-3 rounded-lg px-3 h-10 text-sm font-medium transition-all active:scale-[0.98] ${
+                className={`group relative flex items-center h-10 rounded-lg text-sm font-medium transition-all active:scale-[0.98] ${
+                  collapsed ? "justify-center px-0" : "gap-3 px-3"
+                } ${
                   active
                     ? "bg-accent-50 text-accent-700"
                     : "text-muted hover:text-dark hover:bg-surface"
@@ -150,7 +154,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
           })}
         </nav>
 
-        <div className="border-t border-border p-3 flex flex-col gap-2">
+        <div className={`border-t border-border p-3 flex flex-col gap-2 ${collapsed ? "items-center" : ""}`}>
           {!collapsed && (
             <div className="flex items-center gap-2.5 px-1 py-1.5">
               <Avatar name={profile.full_name || profile.email} size="md" />
@@ -167,7 +171,10 @@ export function Sidebar({ profile }: { profile: Profile }) {
           <button
             onClick={handleSignOut}
             disabled={signingOut}
-            className="flex items-center gap-3 rounded-lg px-3 h-9 text-sm text-muted hover:text-dark hover:bg-surface transition-all active:scale-[0.98] disabled:opacity-50"
+            title={collapsed ? "Keluar" : undefined}
+            className={`flex items-center h-9 rounded-lg text-sm text-muted hover:text-dark hover:bg-surface transition-all active:scale-[0.98] disabled:opacity-50 ${
+              collapsed ? "justify-center w-9" : "gap-3 px-3"
+            }`}
           >
             <LogOut className="size-4 shrink-0" />
             {!collapsed && <span>Keluar</span>}

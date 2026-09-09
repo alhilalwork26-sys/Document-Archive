@@ -6,7 +6,6 @@ import {
   FileText,
   FolderLock,
   Search,
-  ShieldCheck,
   UploadCloud,
   Users,
 } from "lucide-react";
@@ -26,10 +25,9 @@ export default function LandingPage() {
     <div className="min-h-screen bg-bg overflow-x-hidden">
       <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6">
         <div className="flex items-center gap-2.5">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-accent-600 text-white">
-            <ShieldCheck className="size-4.5" />
-          </div>
-          <span className="text-sm font-semibold text-dark">ArsipOne GRCC</span>
+          {/* eslint-disable-next-line @next/next/no-img-element -- static local asset */}
+          <img src="/grcc-mark.png" alt="GRCC" className="h-7 w-auto" />
+          <span className="text-sm font-semibold text-dark">ArsipOne</span>
         </div>
         <Link
           href="/login"
@@ -87,7 +85,8 @@ export default function LandingPage() {
             animate={{ y: [0, -6, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           >
-            <ShieldCheck className="size-14 text-accent-600" strokeWidth={1.5} />
+            {/* eslint-disable-next-line @next/next/no-img-element -- static local asset */}
+            <img src="/grcc-mark.png" alt="GRCC" className="h-10 w-auto" />
           </motion.div>
         </motion.div>
 

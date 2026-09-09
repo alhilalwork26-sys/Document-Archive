@@ -122,8 +122,11 @@ create table if not exists document_archive.folders (
   description  text,
   color        text not null default '#4F46E5',
   created_by   uuid references document_archive.profiles(id) on delete set null,
-  created_at   timestamptz not null default now()
+  created_at   timestamptz not null default now(),
+  is_pinned    boolean not null default false
 );
+
+alter table document_archive.folders add column if not exists is_pinned boolean not null default false;
 
 -- 3. DOCUMENTS
 create table if not exists document_archive.documents (

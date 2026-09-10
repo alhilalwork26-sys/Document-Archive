@@ -47,6 +47,69 @@ export async function POST(request: Request) {
     },
   });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (error) {
+    // This Supabase project is shared with other GRCC apps (see
+    // supabase-schema.sql) — auth.users is project-wide, so an email
+    // already registered there by grccunairdashboard (or any other app)
+    // collides here too, even though this app has never seen it. Rather
+    // than dead-ending on that, link the existing auth user into this
+    // app's profiles table instead of creating a duplicate account. The
+    // person keeps logging in with whatever password their existing
+    // account already has — we deliberately do NOT overwrite it with the
+    // "Kata Sandi Awal" typed here, since that would also change their
+    // password for the other app.
+    const alreadyRegistered = /already.*registered|already.*exists/i.test(error.message);
+    if (alreadyRegistered) {
+      const { data: existing } = await admin
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (existing) {
+        return NextResponse.json(
+          { error: "Email ini sudah punya akun di Arsip Dokumen GRCC." },
+          { status: 400 },
+        );
+      }
+
+      let matchedUserId: string | null = null;
+      let page = 1;
+      while (!matchedUserId) {
+        const { data: pageData, error: listError } = await admin.auth.admin.listUsers({
+          page,
+          perPage: 200,
+        });
+        if (listError || !pageData || pageData.users.length === 0) break;
+        const match = pageData.users.find(
+          (u) => u.email?.toLowerCase() === String(email).toLowerCase(),
+        );
+        if (match) matchedUserId = match.id;
+        else if (pageData.users.length < 200) break;
+        else page += 1;
+      }
+
+      if (!matchedUserId) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+      }
+
+      const { error: linkError } = await admin.from("profiles").upsert({
+        id: matchedUserId,
+        email,
+        full_name: full_name || email.split("@")[0],
+        role: role || "user",
+        is_active: true,
+      });
+
+      if (linkError) {
+        return NextResponse.json({ error: linkError.message }, { status: 400 });
+      }
+
+      return NextResponse.json({ ok: true, id: matchedUserId, linkedExisting: true });
+    }
+
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
   return NextResponse.json({ ok: true, id: data.user?.id });
 }

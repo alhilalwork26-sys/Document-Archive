@@ -46,7 +46,14 @@ export function AddUserModal({
       setError(data.error || "Gagal membuat akun.");
       return;
     }
-    push("success", `Akun untuk ${email} berhasil dibuat.`);
+    if (data.linkedExisting) {
+      push(
+        "success",
+        `${email} sudah punya akun GRCC (aplikasi lain) — akses Arsip Dokumen ditambahkan ke akun itu. Mereka login pakai password lama mereka, bukan yang baru diketik.`,
+      );
+    } else {
+      push("success", `Akun untuk ${email} berhasil dibuat.`);
+    }
     reset();
     onCreated?.();
     onClose();

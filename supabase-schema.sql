@@ -117,16 +117,23 @@ $$;
 
 -- 2. FOLDERS
 create table if not exists document_archive.folders (
-  id           uuid primary key default gen_random_uuid(),
-  name         text not null,
-  description  text,
-  color        text not null default '#4F46E5',
-  created_by   uuid references document_archive.profiles(id) on delete set null,
-  created_at   timestamptz not null default now(),
-  is_pinned    boolean not null default false
+  id                 uuid primary key default gen_random_uuid(),
+  name               text not null,
+  description        text,
+  color              text not null default '#4F46E5',
+  created_by         uuid references document_archive.profiles(id) on delete set null,
+  created_at         timestamptz not null default now(),
+  is_pinned          boolean not null default false,
+  -- Sub-folders: null = top-level folder. Cascades so deleting a folder
+  -- also deletes its whole sub-tree (documents inside cascade too via
+  -- documents.folder_id's own "on delete cascade").
+  parent_folder_id   uuid references document_archive.folders(id) on delete cascade
 );
 
 alter table document_archive.folders add column if not exists is_pinned boolean not null default false;
+alter table document_archive.folders add column if not exists parent_folder_id uuid references document_archive.folders(id) on delete cascade;
+
+create index if not exists folders_parent_folder_id_idx on document_archive.folders(parent_folder_id);
 
 -- 3. DOCUMENTS
 create table if not exists document_archive.documents (

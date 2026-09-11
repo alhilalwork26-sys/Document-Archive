@@ -15,8 +15,11 @@ export function FoldersView({ initialFolders }: { initialFolders: Folder[] }) {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [folderModalOpen, setFolderModalOpen] = useState(false);
 
-  const pinnedFolders = initialFolders.filter((f) => f.is_pinned);
-  const unpinnedFolders = initialFolders.filter((f) => !f.is_pinned);
+  // Only top-level folders show here — sub-folders (parent_folder_id set)
+  // appear nested inside their parent's own page.
+  const rootFolders = initialFolders.filter((f) => !f.parent_folder_id);
+  const pinnedFolders = rootFolders.filter((f) => f.is_pinned);
+  const unpinnedFolders = rootFolders.filter((f) => !f.is_pinned);
 
   function refresh() {
     router.refresh();
@@ -49,7 +52,7 @@ export function FoldersView({ initialFolders }: { initialFolders: Folder[] }) {
       )}
 
       {unpinnedFolders.length === 0 ? (
-        initialFolders.length === 0 && (
+        rootFolders.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border py-16 text-center">
             <p className="text-sm text-muted">Belum ada folder. Buat folder pertama Anda.</p>
           </div>

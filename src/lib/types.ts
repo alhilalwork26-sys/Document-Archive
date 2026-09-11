@@ -18,8 +18,10 @@ export interface Folder {
   created_by: string;
   created_at: string;
   is_pinned: boolean;
+  parent_folder_id: string | null;
   document_count?: number;
   total_bytes?: number;
+  subfolder_count?: number;
 }
 
 export type SortValue =

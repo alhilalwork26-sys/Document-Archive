@@ -33,8 +33,11 @@ export function DashboardView({
   const [categoryFilter, setCategoryFilter] = useState<Set<FileCategory>>(new Set());
 
   const recent = initialDocuments.slice(0, 6);
-  const pinnedFolders = initialFolders.filter((f) => f.is_pinned);
-  const unpinnedFolders = initialFolders.filter((f) => !f.is_pinned);
+  // Dashboard/Documents grids only show top-level folders — sub-folders
+  // (parent_folder_id set) appear nested inside their parent's own page.
+  const rootFolders = initialFolders.filter((f) => !f.parent_folder_id);
+  const pinnedFolders = rootFolders.filter((f) => f.is_pinned);
+  const unpinnedFolders = rootFolders.filter((f) => !f.is_pinned);
 
   const visibleDocuments = useMemo(() => {
     let rows = initialDocuments;
@@ -106,7 +109,7 @@ export function DashboardView({
         {unpinnedFolders.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-border py-10 text-center">
             <p className="text-sm text-muted">
-              {initialFolders.length === 0
+              {rootFolders.length === 0
                 ? "Belum ada folder. Buat folder pertama Anda."
                 : "Semua folder sudah disematkan."}
             </p>

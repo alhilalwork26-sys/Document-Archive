@@ -14,10 +14,12 @@ export function NewFolderModal({
   open,
   onClose,
   onCreated,
+  parentFolderId,
 }: {
   open: boolean;
   onClose: () => void;
   onCreated?: () => void;
+  parentFolderId?: string;
 }) {
   const { push } = useToast();
   const [name, setName] = useState("");
@@ -44,6 +46,7 @@ export function NewFolderModal({
       description: description.trim() || null,
       color,
       created_by: user?.id,
+      parent_folder_id: parentFolderId ?? null,
     });
     setLoading(false);
     if (error) {
